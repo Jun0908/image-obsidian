@@ -1,6 +1,7 @@
 from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 
 import numpy as np
 
@@ -51,8 +52,11 @@ def rebuild_edges_for_node(new_node: Node) -> list[Edge]:
 
 def get_graph_data() -> dict:
     """D3.js が受け取れる nodes / links 形式でグラフデータを返す。"""
-    nodes = db.get_all_nodes()
-    edges = db.get_all_edges()
+    all_nodes = db.get_all_nodes()
+    # 画像ファイルが存在するノードのみ返す
+    nodes = [n for n in all_nodes if Path(n.file_path).exists()]
+    valid_ids = {n.id for n in nodes}
+    edges = [e for e in db.get_all_edges() if e.source_id in valid_ids and e.target_id in valid_ids]
     return {
         "nodes": [n.to_dict() for n in nodes],
         "links": [e.to_dict() for e in edges],

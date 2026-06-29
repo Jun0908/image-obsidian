@@ -61,6 +61,19 @@ def update_node(node_id: str, meta: NodeMeta):
     return {"ok": True}
 
 
+# ── ノード削除 ────────────────────────────────────────────────
+@router.delete("/nodes/{node_id}")
+def delete_node(node_id: str):
+    node = db.get_node(node_id)
+    if node is None:
+        raise HTTPException(status_code=404, detail="Node not found")
+    path = Path(node.file_path)
+    if path.exists():
+        path.unlink()
+    db.delete_node(node_id)
+    return {"ok": True}
+
+
 # ── 画像ファイル配信 ──────────────────────────────────────────
 @router.get("/images/{node_id}")
 def serve_image(node_id: str):

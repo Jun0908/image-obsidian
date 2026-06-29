@@ -131,6 +131,12 @@ def delete_edges_for_node(node_id: str) -> None:
         conn.execute("DELETE FROM edges WHERE source_id=? OR target_id=?", (node_id, node_id))
 
 
+def delete_node(node_id: str) -> None:
+    with get_conn() as conn:
+        conn.execute("DELETE FROM edges WHERE source_id=? OR target_id=?", (node_id, node_id))
+        conn.execute("DELETE FROM nodes WHERE id=?", (node_id,))
+
+
 def get_all_edges() -> list[Edge]:
     with get_conn() as conn:
         rows = conn.execute("SELECT * FROM edges").fetchall()
